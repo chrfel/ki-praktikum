@@ -81,7 +81,6 @@ class TicTacToe(object):
                 break
             
             
-
-
-tic = TicTacToe()
-tic.start()
+if __name__ == "__main__": 
+    tic = TicTacToe()
+    tic.start()
