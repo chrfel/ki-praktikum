@@ -24,8 +24,9 @@ if __name__ == "__main__":
         pprint(fruit_dict)
 
     # Generator
-    fakultaeten = [faku(x) for x in range(10)]
-    print(fakultaeten)
+    fakultaeten = (faku(x) for x in range(10))
+    for i in fakultaeten:
+        print(i)
 
     # Generator yield
     fakultaetenGenerator = create_generator()
