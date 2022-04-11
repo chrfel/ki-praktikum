@@ -65,21 +65,21 @@ class TicTacToe(object):
 
     def start(self):    
         for x in range(9):
-            self.show_board()
+            #self.show_board()
             if x % 2 == 0:
                 self.get_move_playerA()
                 if self.is_winner("X"):
-                    self.show_board()
+                    #self.show_board()
                     print("Spieler A hat gewonnen!")
                     return 1
             else:
                 self.get_move_playerB()
                 if self.is_winner("O"):
-                    self.show_board()
+                    #self.show_board()
                     print("Spieler B hat gewonnen!")
                     return 2
             if self.is_board_full():
-                self.show_board()
+                #self.show_board()
                 print("Es gibt keinen Sieger! Schade Schade")
                 return 0
             

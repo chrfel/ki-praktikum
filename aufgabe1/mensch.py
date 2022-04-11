@@ -8,7 +8,11 @@ class Mensch:
         self.name = name
 
     def __str__(self) -> str:
+        self.__test()
         return f"{self.name} {self.groesse}"
+
+    def __test(self):
+        print("Hallo")
 
 class SteinzeitMensch(Mensch):
 
@@ -20,3 +24,4 @@ if __name__ == "__main__":
     ulli = SteinzeitMensch(150, "Ulli")
     print(peter)
     print(ulli)
+    # peter.__test()

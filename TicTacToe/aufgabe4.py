@@ -35,4 +35,16 @@ class TicTacToeKI(TicTacToe):
 
 if __name__ == "__main__": 
     tic = TicTacToeKI(True, True)
-    tic.start()
+    a, b, c = 0,0,0
+    for i in range(1000):
+        print(i)
+        num = tic.start()
+        if num == 0:
+            c +=1
+        elif num == 1:
+            a += 1
+        else:
+            b +=1
+    print(a)
+    print(b)
+    print(c)
