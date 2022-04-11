@@ -24,11 +24,13 @@ if __name__ == "__main__":
         pprint(fruit_dict)
 
     # Generator
-    fakultaeten = (faku(x) for x in range(10))
+    print("Generator 3^x:")
+    fakultaeten = (3**x for x in range(10))
     for i in fakultaeten:
         print(i)
 
     # Generator yield
+    print("Fibonacci Generator Yield:")
     fakultaetenGenerator = create_generator()
     for i in fakultaetenGenerator:
         print(i)

@@ -69,16 +69,19 @@ class TicTacToe(object):
             if x % 2 == 0:
                 self.get_move_playerA()
                 if self.is_winner("X"):
+                    self.show_board()
                     print("Spieler A hat gewonnen!")
-                    break
+                    return 1
             else:
                 self.get_move_playerB()
                 if self.is_winner("O"):
+                    self.show_board()
                     print("Spieler B hat gewonnen!")
-                    break
+                    return 2
             if self.is_board_full():
+                self.show_board()
                 print("Es gibt keinen Sieger! Schade Schade")
-                break
+                return 0
             
             
 if __name__ == "__main__": 
