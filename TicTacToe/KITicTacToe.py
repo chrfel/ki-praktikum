@@ -1,9 +1,11 @@
+from audioop import minmax
 from pprint import pprint
 import queue
 import random
 from queue import PriorityQueue
 from abc import ABC, abstractmethod
 from typing import List, Dict
+from numpy import argmax
 
 class Board():
     @staticmethod
@@ -133,10 +135,59 @@ class UniformCostSearchPlayer():
 
 
 class MinMaxPlayer(Player):
-    def get_move(self, board):
-        pass
 
-        
+    def get_move(self, board: dict):
+        if len(Board.get_free_fields(board)) % 2 == 1:
+            playerChar = "X"
+        else:
+            playerChar = "O"
+        action_res = []
+        for i in range(9):
+            if (Board.is_field_free(str(i), board)):
+                board[str(i)] = playerChar
+                action_res.append(self.min(board))
+                board[str(i)] = " "
+        print(action_res)
+        return Board.get_free_fields(board)[argmax(action_res)]
+
+    def min(self, board: Dict[str,str]):
+        if len(Board.get_free_fields(board)) % 2 == 1:
+            playerChar = "X"
+        else:
+            playerChar = "O"
+        if Board.is_winner("X", board):
+            return 1
+        if Board.is_winner("O", board):
+            return -1
+        if Board.is_tie(board):
+            return 0
+        v = 2
+        for i in range(9):
+            if (Board.is_field_free(str(i), board)):
+                board[str(i)] = playerChar
+                v = min(v, self.max(board))
+                board[str(i)] = " "
+        return v
+    
+    def max(self, board: Dict[str,str]):
+        if len(Board.get_free_fields(board)) % 2 == 1:
+            playerChar = "X"
+        else:
+            playerChar = "O"
+        if Board.is_winner("X", board):
+            return 1
+        if Board.is_winner("O", board):
+            return -1
+        if Board.is_tie(board):
+            return 0
+        v = -2
+        for i in range(9):
+            if (Board.is_field_free(str(i), board)):
+                board[str(i)] = playerChar
+                v = max(v, self.min(board))
+                board[str(i)] = " "
+        return v
+
 
 class TicTacToeKI():
     playerA: Player
@@ -148,7 +199,7 @@ class TicTacToeKI():
     }
     preset_board = {
             "0": "X","1": " ","2": " ",
-            "3": "O","4": "X","5": " ",
+            "3": "O","4": " ","5": " ",
             "6": " ","7": " ","8": " "
     }
 
@@ -197,7 +248,6 @@ class TicTacToeKI():
         # Game
         for x in range(9):
             Board.show_board(self.board)
-            pprint(Board.get_free_fields(self.board))
             if x % 2 == 0:
                 self.get_move_playerA()
                 if Board.is_winner("X", self.board):
