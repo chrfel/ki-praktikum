@@ -1,4 +1,5 @@
 import random
+from queue import PriorityQueue
 from abc import ABC, abstractmethod
 
 class Board():
@@ -67,8 +68,14 @@ class UniformCostSearchPlayer(Player):
 
     def get_move(self, board):
         node = {board.board : 0}
-        frontier = [node]
+        frontier = PriorityQueue()
+        frontier.put((0, board.board))
         explored = []
+
+        while True:
+            if frontier.empty():
+                exit(2)
+            frontier.get()
         pass
 
 class MinMaxPlayer(Player):
