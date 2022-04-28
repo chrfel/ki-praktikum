@@ -1,6 +1,4 @@
-from audioop import minmax
-from pprint import pprint
-import queue
+from copy import deepcopy
 import random
 from queue import PriorityQueue
 from abc import ABC, abstractmethod
@@ -30,7 +28,7 @@ class Board():
 
     @staticmethod
     def is_board_full(board: Dict[str,str]) -> bool:
-        return ' ' not in board.values()
+        return " " not in board.values()
 
     @staticmethod
     def is_tie(board: Dict[str,str]) -> bool:
@@ -83,13 +81,20 @@ class RandomPlayer(Player):
 class PriorityEntry(object):
     def __init__(self, priority: int, data: Dict[str,str]):
         self.data = data
-        self.priority = priority
+        self._priority = priority
+
+    @property
+    def priority(self):
+        return self._priority
 
     def __lt__(self, other):
         return self.priority < other.priority
 
     def __eq__(self, __o: object) -> bool:
         return self.data == __o.data
+
+    def __hash__(self) -> int:
+        return hash(self.priority)
 class UniformCostSearchPlayer():
 
     def get_path_cost(self, board: Dict[str,str]):
@@ -104,7 +109,7 @@ class UniformCostSearchPlayer():
         node = PriorityEntry(0, board)
         frontier = PriorityQueue()
         frontier.put(node)
-        explored = []
+        explored = set()
 
         while True:
             if frontier.empty():
@@ -113,24 +118,23 @@ class UniformCostSearchPlayer():
             node = frontier.get()
             if Board.is_tie(node.data):
                 return node.data
-            explored.append(node.data)
+            explored.add(node)
 
+            if len(Board.get_free_fields(node.data)) % 2 == 1:
+                playerChar = "X"
+            else:
+                playerChar = "O"
             for i in Board.get_free_fields(node.data):
-                child_board = dict(node.data)
-                if len(Board.get_free_fields(node.data)) % 2 == 1:
-                    playerChar = "X"
-                else:
-                    playerChar = "O"
+                child_board = deepcopy(node.data)
                 child_board[i] = playerChar
                 child_path_cost = node.priority + self.get_path_cost(child_board)
                 child = PriorityEntry(child_path_cost, child_board)
-                if child.data not in explored or child not in frontier.queue:
-                    print(child_path_cost)
+                if child not in explored or child not in frontier.queue:
                     frontier.put(child)
-                # elif child in frontier.queue:
-                #     for i in frontier.queue:
-                #         if frontier.queue[i].data == child_board and frontier.queue[i].priority > child_path_cost:
-                #             frontier.queue[i].priority = child_path_cost
+                elif child in frontier.queue:
+                    for i in frontier.queue:
+                        if frontier.queue[i].data == child_board and frontier.queue[i].priority > child_path_cost:
+                            frontier.queue[i].priority = child_path_cost
 
 
 
@@ -145,48 +149,46 @@ class MinMaxPlayer(Player):
         for i in range(9):
             if (Board.is_field_free(str(i), board)):
                 board[str(i)] = playerChar
-                action_res.append(self.min(board))
+                action_res.append(self.min(playerChar ,board))
                 board[str(i)] = " "
         print(action_res)
         return Board.get_free_fields(board)[argmax(action_res)]
 
-    def min(self, board: Dict[str,str]):
-        if len(Board.get_free_fields(board)) % 2 == 1:
-            playerChar = "X"
-        else:
-            playerChar = "O"
-        if Board.is_winner("X", board):
+    def utility(self, playerChar: str, board: Dict[str,str]):
+        if Board.is_winner(playerChar, board):
             return 1
-        if Board.is_winner("O", board):
-            return -1
         if Board.is_tie(board):
             return 0
-        v = 2
+        else:
+            return -1
+
+    def min(self, orginalPlayer: str , board: Dict[str,str]):
+        if Board.is_tie(board) or Board.is_winner("X", board) or Board.is_winner("O", board):
+            return self.utility(orginalPlayer, board)
+        _v = 2
         for i in range(9):
             if (Board.is_field_free(str(i), board)):
-                board[str(i)] = playerChar
-                v = min(v, self.max(board))
+                if len(Board.get_free_fields(board)) % 2 == 1:
+                    board[str(i)] = "X"
+                else:
+                    board[str(i)] = "O"
+                _v = min(_v, self.max(orginalPlayer, board))
                 board[str(i)] = " "
-        return v
+        return _v
     
-    def max(self, board: Dict[str,str]):
-        if len(Board.get_free_fields(board)) % 2 == 1:
-            playerChar = "X"
-        else:
-            playerChar = "O"
-        if Board.is_winner("X", board):
-            return 1
-        if Board.is_winner("O", board):
-            return -1
-        if Board.is_tie(board):
-            return 0
-        v = -2
+    def max(self, orginalPlayer: str, board: Dict[str,str]):
+        if Board.is_tie(board) or Board.is_winner("X", board) or Board.is_winner("O", board):
+            return self.utility(orginalPlayer, board)
+        _v = -2
         for i in range(9):
             if (Board.is_field_free(str(i), board)):
-                board[str(i)] = playerChar
-                v = max(v, self.min(board))
+                if len(Board.get_free_fields(board)) % 2 == 1:
+                    board[str(i)] = "X"
+                else:
+                    board[str(i)] = "O"
+                _v = max(_v, self.min(orginalPlayer, board))
                 board[str(i)] = " "
-        return v
+        return _v
 
 
 class TicTacToeKI():
@@ -195,11 +197,6 @@ class TicTacToeKI():
     board = {
             "0": " ","1": " ","2": " ",
             "3": " ","4": " ","5": " ",
-            "6": " ","7": " ","8": " "
-    }
-    preset_board = {
-            "0": "X","1": " ","2": " ",
-            "3": "O","4": " ","5": " ",
             "6": " ","7": " ","8": " "
     }
 
@@ -226,8 +223,8 @@ class TicTacToeKI():
         print("Uniform Cost Simulation? y/n ")
         if input() == 'y':
             unPlayer = UniformCostSearchPlayer()
-            self.preset_board = unPlayer.get_move(self.preset_board)
-            Board.show_board(self.preset_board)
+            self.board = unPlayer.get_move(self.board)
+            Board.show_board(self.board)
             return 0
         print("Waehle Spieler X: ")
         in1 = input()
