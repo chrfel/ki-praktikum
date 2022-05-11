@@ -1,8 +1,13 @@
 from concurrent.futures import ProcessPoolExecutor
 import json
 from pprint import pprint
+from queue import Queue
+import queue
+from webbrowser import Konqueror
+
 
 from numpy import number
+
 
 class Knoten():
     name: str
@@ -20,8 +25,25 @@ class Knoten():
 
 class AStern():
 
-    def calculateHeuristik(self, aktuellerKnoten, zielKnoten, alleKnoten): 
-        pass
+    def calculateHeuristik(self, aktuellerKnoten, zielKnoten, alleKnoten):
+        guenstigste = float("inf")
+        for i in alleKnoten:
+            for k in i.nachbarn:
+                guenstigste = min(guenstigste, k.kosten)
+        knoten = Queue()
+        for i in aktuellerKnoten.nachbarn:
+            knoten.put((i, 0))
+        while True:
+            if knoten.empty():
+                return None
+            i = knoten.get()
+            if i[0].name == zielKnoten.name:
+                return i[1]*guenstigste
+            for k in alleKnoten:
+                if k.name == i[0].name:
+                    for p in k.nachbarn:
+                        knoten.put((p, i[1]+1))
+
 
     def readJson(self):
         knoten = []
@@ -64,6 +86,7 @@ class AStern():
     #                     if frontier.queue[i].data == child_board and frontier.queue[i].priority > child_path_cost:
     #                         frontier.queue[i].priority = child_path_cost
 
+
 if __name__ == "__main__":
     var = AStern()
     knoten = var.readJson()
@@ -71,5 +94,7 @@ if __name__ == "__main__":
         pprint(i.name)
         for k in i.nachbarn:
             pprint(f"Nachbar: {k.name}")
+    heu = var.calculateHeuristik(knoten[0], knoten[5], knoten)
+    print(heu)
     #unPlayer = UniformCostSearchWithAStern()
     #self.board = unPlayer.calculate_end_note(self.board)
