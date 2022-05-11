@@ -1,0 +1,166 @@
+{
+  "knoten": [
+    {
+      "name": "a",
+      "nachbarn": [
+        {
+          "name": "i",
+          "kosten": 138
+        },
+        {
+          "name": "h",
+          "kosten": 333
+        },
+        {
+          "name": "f",
+          "kosten": 193
+        }
+      ]
+    },
+    {
+      "name": "i",
+      "nachbarn": [
+        {
+          "name": "a",
+          "kosten": 138
+        }
+      ]
+    },
+    {
+      "name": "f",
+      "nachbarn": [
+        {
+          "name": "b",
+          "kosten": 245
+        },
+        {
+          "name": "e",
+          "kosten": 264
+        },
+        {
+          "name": "a",
+          "kosten": 193
+        },
+        {
+          "name": "c",
+          "kosten": 301
+        }
+      ]
+    },
+    {
+      "name": "c",
+      "nachbarn": [
+        {
+          "name": "e",
+          "kosten": 1364
+        },
+        {
+          "name": "f",
+          "kosten": 301
+        }
+      ]
+    },
+    {
+      "name": "e",
+      "nachbarn": [
+        {
+          "name": "f",
+          "kosten": 264
+        },
+        {
+          "name": "j",
+          "kosten": 311
+        },
+        {
+          "name": "c",
+          "kosten": 1364
+        }
+      ]
+    },
+    {
+      "name": "j",
+      "nachbarn": [
+        {
+          "name": "b",
+          "kosten": 354
+        },
+        {
+          "name": "e",
+          "kosten": 311
+        },
+        {
+          "name": "d",
+          "kosten": 164
+        }
+      ]
+    },
+    {
+      "name": "d",
+      "nachbarn": [
+        {
+          "name": "g",
+          "kosten": 209
+        },
+        {
+          "name": "j",
+          "kosten": 164
+        }
+      ]
+    },
+    {
+      "name": "g",
+      "nachbarn": [
+        {
+          "name": "d",
+          "kosten": 209
+        },
+        {
+          "name": "h",
+          "kosten": 273
+        },
+        {
+          "name": "b",
+          "kosten": 433
+        }
+      ]
+    },
+    {
+      "name": "h",
+      "nachbarn": [
+        {
+          "name": "b",
+          "kosten": 160
+        },
+        {
+          "name": "g",
+          "kosten": 273
+        },
+        {
+          "name": "a",
+          "kosten": 333
+        }
+      ]
+    },
+    {
+      "name": "b",
+      "nachbarn": [
+        {
+          "name": "g",
+          "kosten": 433
+        },
+        {
+          "name": "h",
+          "kosten": 160
+        },
+        {
+          "name": "f",
+          "kosten": 245
+        },
+        {
+          "name": "j",
+          "kosten": 354
+        }
+      ]
+    }
+  ]
+}
