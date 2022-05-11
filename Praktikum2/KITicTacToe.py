@@ -55,7 +55,7 @@ class TicTacToeKI():
         elif in2 == 'm':
             self.playerB = MinMaxPlayer()
         elif in2 == 'mp':
-            self.playerA = MinMaxPlayerWithPruning()
+            self.playerB = MinMaxPlayerWithPruning()
         # Game
         for x in range(9):
             Board.show_board(self.board)
