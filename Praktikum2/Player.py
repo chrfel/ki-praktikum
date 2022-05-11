@@ -74,8 +74,6 @@ class UniformCostSearch():
                         if frontier.queue[i].data == child_board and frontier.queue[i].priority > child_path_cost:
                             frontier.queue[i].priority = child_path_cost
 
-
-
 class MinMaxPlayer(Player):
 
     def get_move(self, board: dict):
@@ -114,4 +112,57 @@ class MinMaxPlayer(Player):
             board[str(i)] = Board.get_player_char(board)
             _v = max(_v, self.min(orginalPlayer, board))
             board[str(i)] = " "
+        return _v
+
+
+class MinMaxPlayerWithPruning(Player):
+
+    def get_move(self, board: dict):
+        playerChar = Board.get_player_char(board)
+        action_res = []
+        for i in Board.get_free_fields(board):
+            board[str(i)] = playerChar
+            alpha =  float("-inf")
+            beta = float("inf")
+            action_res.append(self.min(playerChar, board, alpha, beta))
+            board[str(i)] = " "
+        print(action_res)
+        return Board.get_free_fields(board)[argmax(action_res)]
+
+    def utility(self, playerChar: str, board: Dict[str, str]):
+        if Board.is_winner(playerChar, board):
+            return 1
+        if Board.is_tie(board):
+            return 0
+        else:
+            return -1
+
+    def max(self, orginalPlayer: str, board: Dict[str, str], alpha: int, beta: int):
+        if Board.is_tie(board) or Board.is_winner("X", board) or Board.is_winner("O", board):
+            return self.utility(orginalPlayer, board)
+        _v = float("-inf")
+        for i in Board.get_free_fields(board):
+            board[str(i)] = Board.get_player_char(board)
+            _v2 = max(_v, self.min(orginalPlayer, board, alpha, beta))
+            board[str(i)] = " "
+            if _v2 > _v:
+                _v = _v2
+                alpha = max(alpha, _v)
+            if _v >= beta:
+                return _v
+        return _v
+
+    def min(self, orginalPlayer: str, board: Dict[str, str], alpha: int, beta: int):
+        if Board.is_tie(board) or Board.is_winner("X", board) or Board.is_winner("O", board):
+            return self.utility(orginalPlayer, board)
+        _v = float("inf")
+        for i in Board.get_free_fields(board):
+            board[str(i)] = Board.get_player_char(board)
+            _v2 = min(_v, self.max(orginalPlayer, board, alpha, beta))
+            board[str(i)] = " "
+            if _v2 < _v:
+                _v = _v2
+                beta = min(beta, _v)
+            if _v <= alpha:
+                return _v
         return _v

@@ -44,6 +44,8 @@ class TicTacToeKI():
             self.playerA = RandomPlayer()
         elif in1 == 'm':
             self.playerA = MinMaxPlayer()
+        elif in1 == 'mp':
+            self.playerA = MinMaxPlayerWithPruning()
         print("Waehle Spieler O: ")
         in2 = input()
         if in2 == 'h':
@@ -52,6 +54,8 @@ class TicTacToeKI():
             self.playerB = RandomPlayer()
         elif in2 == 'm':
             self.playerB = MinMaxPlayer()
+        elif in2 == 'mp':
+            self.playerA = MinMaxPlayerWithPruning()
         # Game
         for x in range(9):
             Board.show_board(self.board)
