@@ -1,35 +1,39 @@
+from concurrent.futures import ProcessPoolExecutor
 import json
 from pprint import pprint
+
+from numpy import number
 
 class Knoten():
     name: str
     nachbarn = []
+    kosten: number
 
-    def __init__(self, name: str):
+    def __init__(self, name: str, kosten: number):
         self.name = name
+        self.kosten = kosten
+        self.nachbarn = []
 
-    def add(self, nachbar: Knoten):
+    def add(self, nachbar):
         self.nachbarn.append(nachbar)
 
 
-class UniformCostSearchWithAStern():
+class AStern():
 
-    # def get_path_cost(self, board: Dict[str, str]):
-    #     if Board.no_winner(board):
-    #         return 1
-    #     return 10
+    def calculateHeuristik(self, aktuellerKnoten, zielKnoten, alleKnoten): 
+        pass
 
     def readJson(self):
-        with open("pfade.json") as file:
-            #pfade_dict = json.loads(file.read())
+        knoten = []
+        with open("AStern/pfade.json") as file:
             data = json.load(file)
             for i in data["knoten"]:
-
+                k = Knoten(i["name"], 0)
                 for j in i["nachbarn"]:
-                    pprint(j)
-            #pprint(pfade_dict)
-            #for k, v in pfade_dict.items():
-               # pprint(f"{k}- {v}")
+                    nachbar = Knoten(j["name"], j["kosten"])
+                    k.add(nachbar)
+                knoten.append(k)
+        return knoten
 
     # def calculate_end_note(self, board: Dict[str, str]):
     #     node = PriorityEntry(0, board)
@@ -61,7 +65,11 @@ class UniformCostSearchWithAStern():
     #                         frontier.queue[i].priority = child_path_cost
 
 if __name__ == "__main__":
-    var = UniformCostSearchWithAStern()
-    var.readJson()
+    var = AStern()
+    knoten = var.readJson()
+    for i in knoten:
+        pprint(i.name)
+        for k in i.nachbarn:
+            pprint(f"Nachbar: {k.name}")
     #unPlayer = UniformCostSearchWithAStern()
     #self.board = unPlayer.calculate_end_note(self.board)
