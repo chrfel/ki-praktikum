@@ -1,12 +1,6 @@
-from concurrent.futures import ProcessPoolExecutor
 import json
 from pprint import pprint
-from queue import PriorityQueue, Queue
-import queue
-from tracemalloc import start
-from webbrowser import Konqueror
-
-
+from queue import Queue
 from numpy import number
 
 
@@ -24,21 +18,22 @@ class Knoten():
         self.nachbarn.append(nachbar)
 
 class AStern():
-
     def sucheKnoten(self, alleKnoten, zuSuchen: str):
         for i in alleKnoten:
             if i.name == zuSuchen:
                 return i
         return None
-
     def calculateHeuristik(self, aktuellerKnoten, zielKnoten, alleKnoten):
         guenstigste = float("inf")
+        # Guenstigsten Pfad raussuchen
         for i in alleKnoten:
             for k in i.nachbarn:
                 guenstigste = min(guenstigste, k.kosten)
         knoten = Queue()
+        # Nachbarn des aktuellen Knotens
         for i in aktuellerKnoten.nachbarn:
             knoten.put((i, 0))
+        # Wenn ein Nachbar nicht Zielknoten ist, dann seine Nachbarn zur Liste mit Weg+1 hinzufügen.
         while True:
             if knoten.empty():
                 return None
@@ -69,18 +64,18 @@ class AStern():
         closed = set([])
 
         # Aktuelle Distanz vom Start zu all anderen Knoten
-        poo = {}
-        poo[startKnoten] = 0
+        distanz = {}
+        distanz[startKnoten] = 0
 
         # Von welchem Knoten komme ich?
-        par = {}
-        par[startKnoten] = startKnoten
+        vorgaengerKnoten = {}
+        vorgaengerKnoten[startKnoten] = startKnoten
 
         while len(open) > 0:
             n = None
             # Geringsten Wert in der Liste finden
             for v in open:
-                if n == None or poo[v] + self.calculateHeuristik(v, zielKnoten, alleKnoten) < poo[n] + self.calculateHeuristik(n, zielKnoten, alleKnoten):
+                if n == None or distanz[v] + self.calculateHeuristik(v, zielKnoten, alleKnoten) < distanz[n] + self.calculateHeuristik(n, zielKnoten, alleKnoten):
                     n = v
             
             if n == None:
@@ -88,9 +83,9 @@ class AStern():
             # Am Zielknoten angekommen
             if n == zielKnoten:
                 path = []
-                while par[n] != n:
+                while vorgaengerKnoten[n] != n:
                     path.append(n.name)
-                    n = par[n]
+                    n = vorgaengerKnoten[n]
                 path.append(startKnoten.name)
                 path.reverse()
                 return path
@@ -100,13 +95,13 @@ class AStern():
                 # Wenn er noch nicht besucht wurde oder schon in der "zu besuchen" Liste steht
                 if knoten not in open and knoten not in closed:
                     open.add(knoten)
-                    par[knoten] = n
-                    poo[knoten] = poo[n] + i.kosten
+                    vorgaengerKnoten[knoten] = n
+                    distanz[knoten] = distanz[n] + i.kosten
                 # Schauen, ob die Kosten vom vorherigen Besuch höher sind
                 else:
-                    if poo[knoten] > poo[n] + i.kosten:
-                        poo[knoten] = poo[n] + i.kosten
-                        par[knoten] = n
+                    if distanz[knoten] > distanz[n] + i.kosten:
+                        distanz[knoten] = distanz[n] + i.kosten
+                        vorgaengerKnoten[knoten] = n
                         # Nochmal besuchen
                         if knoten in closed:
                             closed.remove(knoten)
@@ -121,5 +116,9 @@ if __name__ == "__main__":
         pprint(i.name)
         for k in i.nachbarn:
             pprint(f"--> Nachbar: {k.name} {k.kosten}")
-    print(var.aStern(knoten, knoten[0], knoten[5]))
+    print("Start eingeben: ")
+    startString = input()
+    print("Ziel eingeben: ")
+    zielString = input()
+    print(var.aStern(knoten, var.sucheKnoten(knoten, startString), var.sucheKnoten(knoten, zielString)))
     
