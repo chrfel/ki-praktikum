@@ -15,40 +15,40 @@ class LogicCalculator:
     lp = LogicParser()
 
     def __init__(self, sentence):
+        # Knowledgebase parsen und setzen
         self.kb = self.lp.parse(sentence)
 
     def tell(self, sentence):
+        # Und Verknüpfung aus alter KB und aktuellem Satz
         self.kb = AndExpression(self.kb, self.lp.parse(sentence))
 
     def drawKb(self):
-        # This is how we can create a Tree
         tree = self.tree_from_expression(self.kb)
-        # and a tree can be drawn
         tree.draw()
 
-
     def tree_from_expression(self, e: Expression):
+        # Abbruchbedingung, wenn keine Kinder mehr da sind --> Keine BinaryExpression, sondern z.B. FunctionVariableExpression A
         if not isinstance(e, BinaryExpression):
+            # Erster Parameter: Expression als String, Zweiter: Children, also keine, weil wir beim Kindknoten sind
             return Tree("%s" % e, [])
 
-        # it should be a And/Orexpression. Unfortunately they don't have a superclass which getOp()
-        label = e.getOp()
+        # Zeichen ausgeben, z.B. &
+        operator = e.getOp()
 
-        chidlren = [
+        # Kinder auswerten
+        children = [
             self.tree_from_expression(e.first),
             self.tree_from_expression(e.second)
         ]
-
-        return Tree(label, chidlren)
+        # Baum rekursiv hochgeben
+        return Tree(operator, children)
 
     def nltk_pl_true(self, model):
         model = model.items()
-
         val = Valuation(model)
         dom = val.domain
         g = Assignment(dom)
         m = Model(dom, val)
-
         # this is how you test whether the model is true for the expression(KB)
         return(m.satisfy(self.kb, g))
 
@@ -56,30 +56,32 @@ class LogicCalculator:
         return self.__pl_true__(self.kb, model)
 
     def __pl_true__(self, exp: Expression, model):
-        # get boolean of leaf node variable
+        # Wenn Buchstabe, z.B. A
         if isinstance(exp, FunctionVariableExpression):
             return model[str(exp)]
 
+        # Negative Expression, z.B. -C
         if isinstance(exp, NegatedExpression):
             return not self.__pl_true__(exp.term, model)
 
+        # Kein Buchstabe und keine BinaryExpression, also z.B. & oder |
         if not isinstance(exp, BinaryExpression):
             raise Exception("Invalid Argument")
 
-        left = self.__pl_true__(exp.first, model)
-        right = self.__pl_true__(exp.second, model)
+        linkerTeilbaum = self.__pl_true__(exp.first, model)
+        rechterTeilbaum = self.__pl_true__(exp.second, model)
 
         if isinstance(exp, AndExpression):
-            return left and right
+            return linkerTeilbaum and rechterTeilbaum
 
         if isinstance(exp, OrExpression):
-            return left or right
+            return linkerTeilbaum or rechterTeilbaum
 
         if isinstance(exp, ImpExpression):
-            return (not left) or right
+            return (not linkerTeilbaum) or rechterTeilbaum
 
         if isinstance(exp, IffExpression):
-            return left == right
+            return linkerTeilbaum == rechterTeilbaum
 
     def test_all_symbols(self, symbols, model):
         if not symbols:
