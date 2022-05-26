@@ -90,12 +90,12 @@ class LogicCalculator:
             return
 
         symbols_copy = symbols.copy()
-        symbol = symbols_copy.pop()
+        letterToCheck = symbols_copy.pop()
 
-        model[symbol] = False
+        model[letterToCheck] = False
         self.test_all_symbols(symbols_copy, model)
 
-        model[symbol] = True
+        model[letterToCheck] = True
         self.test_all_symbols(symbols_copy, model)
 
     def get_all_symbols(self, exp: Expression):
@@ -111,9 +111,11 @@ class LogicCalculator:
         return set.union(self.get_all_symbols(exp.first), self.get_all_symbols(exp.second))
 
     def tt_entails(self, alpha):
+        # Input Ausdruck
         alpha = self.lp.parse(alpha)
+        # Alle Symbole aus der Knowledgebase und dem Ausdruck sammeln
         symbols = list(set.union(self.get_all_symbols(self.kb), self.get_all_symbols(alpha)))
-
+        # Rein da
         return self.tt_check_all(alpha, symbols, {})
 
     def tt_check_all(self, alpha, symbols, model):
