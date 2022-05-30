@@ -116,11 +116,11 @@
         },
         {
           "name": "h",
-          "kosten": 273
+          "kosten": 274
         },
         {
           "name": "b",
-          "kosten": 433
+          "kosten": 1434
         }
       ]
     },
@@ -129,11 +129,11 @@
       "nachbarn": [
         {
           "name": "b",
-          "kosten": 160
+          "kosten": 1160
         },
         {
           "name": "g",
-          "kosten": 273
+          "kosten": 274
         },
         {
           "name": "a",
@@ -146,11 +146,11 @@
       "nachbarn": [
         {
           "name": "g",
-          "kosten": 433
+          "kosten": 1434
         },
         {
           "name": "h",
-          "kosten": 160
+          "kosten": 1160
         },
         {
           "name": "f",
