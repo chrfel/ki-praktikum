@@ -3,15 +3,7 @@ from nltk.sem import Model, Valuation, Assignment
 from nltk.tree import Tree
 
 
-# operatorreihenfolge:
-# 1. -
-# 2. &
-# 3. |
-# 4. ->
-# 5. <->
-
-
-class LogicCalculator:
+class LogicWrapper:
     lp = LogicParser()
 
     def __init__(self, sentence):
@@ -23,22 +15,33 @@ class LogicCalculator:
         self.kb = AndExpression(self.kb, self.lp.parse(sentence))
 
     def drawKb(self):
-        tree = self.tree_from_expression(self.kb)
-        tree.draw()
+        tree = self.prepareTree(self.kb)
+        tree.pretty_print()
 
-    def tree_from_expression(self, e: Expression):
+    def prepareTree(self, e: Expression):
+        # Negierung alleine durchfuehren
+        if isinstance(e, NegatedExpression):
+            operator = "NOT"
+            children = [
+                self.prepareTree(e.term)
+            ]
+            return Tree(operator, children)
         # Abbruchbedingung, wenn keine Kinder mehr da sind --> Keine BinaryExpression, sondern z.B. FunctionVariableExpression A
         if not isinstance(e, BinaryExpression):
             # Erster Parameter: Expression als String, Zweiter: Children, also keine, weil wir beim Kindknoten sind
-            return Tree("%s" % e, [])
+            return e
 
         # Zeichen ausgeben, z.B. &
         operator = e.getOp()
+        if operator == "&":
+            operator = "AND"
+        if operator == "|":
+            operator = "OR"
 
         # Kinder auswerten
         children = [
-            self.tree_from_expression(e.first),
-            self.tree_from_expression(e.second)
+            self.prepareTree(e.first),
+            self.prepareTree(e.second)
         ]
         # Baum rekursiv hochgeben
         return Tree(operator, children)
@@ -68,20 +71,20 @@ class LogicCalculator:
         if not isinstance(exp, BinaryExpression):
             raise Exception("Invalid Argument")
 
-        linkerTeilbaum = self.__pl_true__(exp.first, model)
-        rechterTeilbaum = self.__pl_true__(exp.second, model)
+        leftTree = self.__pl_true__(exp.first, model)
+        rightTree = self.__pl_true__(exp.second, model)
 
         if isinstance(exp, AndExpression):
-            return linkerTeilbaum and rechterTeilbaum
+            return leftTree and rightTree
 
         if isinstance(exp, OrExpression):
-            return linkerTeilbaum or rechterTeilbaum
+            return leftTree or rightTree
 
         if isinstance(exp, ImpExpression):
-            return (not linkerTeilbaum) or rechterTeilbaum
+            return (not leftTree) or rightTree
 
         if isinstance(exp, IffExpression):
-            return linkerTeilbaum == rechterTeilbaum
+            return leftTree == rightTree
 
     def test_all_symbols(self, symbols, model):
         if not symbols:

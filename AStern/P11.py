@@ -47,7 +47,7 @@ class AStern():
 
     def readJson(self):
         knoten = []
-        with open("AStern/pfade.json") as file:
+        with open("pfade.json") as file:
             data = json.load(file)
             for i in data["knoten"]:
                 k = Knoten(i["name"], 0)
