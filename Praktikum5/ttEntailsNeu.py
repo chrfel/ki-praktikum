@@ -56,7 +56,7 @@ if __name__ == "__main__":
     
     symbols = ["A", "B", "C", "D"]
     symbols.reverse()
-    lc.test_all_symbols(symbols, {})
+    #lc.test_all_symbols(symbols, {})
 
     print("A -> B -> C -> D")
     print(lc.tt_entails("A -> B -> C -> D"))
